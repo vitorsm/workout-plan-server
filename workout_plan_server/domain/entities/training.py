@@ -23,3 +23,13 @@ class Training(GenericEntity):
 
     def __generate_training_name(self) -> str:
         return f"Training {self.start_date.date()}"
+
+    def get_missing_fields(self) -> List[str]:
+        missing_fields = list()
+
+        if not self.name:
+            missing_fields.append("name")
+        if not self.start_date:
+            missing_fields.append("start_date")
+
+        return missing_fields

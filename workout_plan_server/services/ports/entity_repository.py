@@ -1,10 +1,12 @@
 import abc
-from typing import Optional
+from typing import Optional, Type, TypeVar, Generic
 
 from workout_plan_server.domain.entities.generic_entity import GenericEntity
 
+Entity = TypeVar("Entity", bound=GenericEntity)
 
-class EntityRepository(metaclass=abc.ABCMeta):
+
+class EntityRepository(Generic[Entity], metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def create(self, entity: GenericEntity) -> GenericEntity:

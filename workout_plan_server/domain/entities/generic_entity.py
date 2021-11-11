@@ -1,16 +1,21 @@
+import abc
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from workout_plan_server.domain.entities.user import User
 
 
-class GenericEntity(object):
+class GenericEntity(metaclass=abc.ABCMeta):
     id: str
     name: str
 
     created_by: User
     created_at: datetime
     modified_at: datetime
+
+    @abc.abstractmethod
+    def get_missing_fields(self) -> List[str]:
+        raise NotImplementedError
 
     def __eq__(self, other):
         return other and self.id == other.id

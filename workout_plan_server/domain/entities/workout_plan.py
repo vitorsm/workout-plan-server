@@ -11,3 +11,15 @@ class WorkoutPlan(GenericEntity):
     exercises: List[ExercisePlan]
     start_date: datetime
     end_date: Optional[datetime]
+
+    def get_missing_fields(self) -> List[str]:
+        missing_fields = list()
+
+        if not self.name:
+            missing_fields.append("name")
+        if not self.start_date:
+            missing_fields.append("start_date")
+        if not self.exercises:
+            missing_fields.append("exercises")
+
+        return missing_fields
