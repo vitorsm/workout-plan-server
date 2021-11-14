@@ -1,0 +1,2 @@
+from workout_plan_server.application.api.api_config import app, workout_plan_api, exercise_namespace
+from workout_plan_server.application.api.exercise_controller import ExerciseController
