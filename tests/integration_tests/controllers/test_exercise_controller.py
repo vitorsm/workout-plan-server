@@ -4,6 +4,9 @@ from tests.integration_tests.controllers.generic_controller_test import GenericC
 
 class TestExerciseController(BaseTest, GenericControllerTest):
 
+    def get_id_from_another_user(self) -> str:
+        return "00000000-0000-0000-0000-000000000003"
+
     def get_default_id(self) -> str:
         return self.default_id
 
@@ -29,6 +32,3 @@ class TestExerciseController(BaseTest, GenericControllerTest):
             "exercise_type": "CARDIO",
             "body_type": "UPPER"
         }
-
-    def get_existing_id(self) -> str:
-        return self.default_id

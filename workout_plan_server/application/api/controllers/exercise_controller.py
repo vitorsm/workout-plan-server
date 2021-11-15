@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt import jwt_required
 
 from workout_plan_server.application.api.config.errors_handler import fill_error_handlers_to_controller
 from workout_plan_server.application.api.mapper.exercise_mapper import ExerciseMapper
@@ -9,6 +10,7 @@ fill_error_handlers_to_controller(exercise_controller)
 
 
 @exercise_controller.route("/", methods=["POST"])
+@jwt_required()
 def create_exercise(exercise_service: ExerciseService):
     exercise = ExerciseMapper.to_entity(request.json)
     exercise = exercise_service.create(exercise)
@@ -16,6 +18,7 @@ def create_exercise(exercise_service: ExerciseService):
 
 
 @exercise_controller.route("<path:exercise_id>", methods=["PUT"])
+@jwt_required()
 def update_exercise(exercise_id: str, exercise_service: ExerciseService):
     exercise = ExerciseMapper.to_entity(request.json)
     exercise.id = exercise_id
@@ -25,18 +28,21 @@ def update_exercise(exercise_id: str, exercise_service: ExerciseService):
 
 
 @exercise_controller.route("<path:exercise_id>", methods=["DELETE"])
+@jwt_required()
 def delete_exercise(exercise_id: str, exercise_service: ExerciseService):
     exercise_service.delete(exercise_id)
     return "", 204
 
 
 @exercise_controller.route("<path:exercise_id>", methods=["GET"])
+@jwt_required()
 def find_exercise_by_id(exercise_id: str, exercise_service: ExerciseService):
     exercise = exercise_service.find_by_id(exercise_id)
     return jsonify(ExerciseMapper.to_dto(exercise)), 200
 
 
 @exercise_controller.route("/", methods=["GET"])
+@jwt_required()
 def find_all_exercises(exercise_service: ExerciseService):
     exercises = exercise_service.find_all_by_user()
     return jsonify([ExerciseMapper.to_dto(exercise) for exercise in exercises]), 200

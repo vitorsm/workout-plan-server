@@ -5,3 +5,4 @@ Flask-SQLAlchemy==2.5.1
 Flask-Injector==0.13.0
 PyMySQL==1.0.2
 Flask-Testing==0.8.1
+Flask-JWT==0.3.2

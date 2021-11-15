@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify
+from flask_jwt import JWTError
 
 from workout_plan_server.application.api.mapper.error_mapper import ErrorMapper
 from workout_plan_server.domain.exceptions.duplicate_entity_exception import DuplicateEntityException
@@ -12,6 +13,11 @@ logger = get_logger(__name__)
 
 
 def fill_error_handlers_to_controller(controller: Blueprint):
+
+    @controller.errorhandler(JWTError)
+    def invalid_entity_exception(exception: JWTError):
+        logger.exception(exception)
+        return jsonify(ErrorMapper.to_dto(exception, 401)), 401
 
     @controller.errorhandler(PermissionException)
     def invalid_entity_exception(exception: PermissionException):

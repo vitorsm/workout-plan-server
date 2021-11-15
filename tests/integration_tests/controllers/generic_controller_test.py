@@ -21,15 +21,16 @@ class GenericControllerTest(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_existing_id(self) -> str:
-        raise NotImplementedError
-
-    @abc.abstractmethod
     def get_default_id(self) -> str:
         raise NotImplementedError
 
-    def get_base_endpoint(self) -> str:
-        return f"/v1/{self.get_entity_path()}/"
+    @abc.abstractmethod
+    def get_id_from_another_user(self) -> str:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def get_authentication_header(self) -> dict:
+        raise NotImplementedError
 
     @abc.abstractmethod
     def client_api(self):
@@ -47,34 +48,58 @@ class GenericControllerTest(metaclass=abc.ABCMeta):
     def assertIsNone(self, item):
         raise NotImplementedError
 
+    def get_base_endpoint(self) -> str:
+        return f"/v1/{self.get_entity_path()}/"
+
     def test_find_by_id(self):
-        response = self.client_api().get(f"{self.get_base_endpoint()}{self.default_id}")
+        response = self.client_api().get(f"{self.get_base_endpoint()}{self.get_default_id()}",
+                                         headers=self.get_authentication_header())
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(200, response.status_code)
         self.__assert_each_item(response_dto)
-        self.assertEqual(self.default_id, response_dto["id"])
+        self.assertEqual(self.get_default_id(), response_dto["id"])
+
+    def test_find_by_id_without_login(self):
+        response = self.client_api().get(f"{self.get_base_endpoint()}{self.get_default_id()}")
+        self.assertEqual(401, response.status_code)
+
+    def test_find_by_id_from_another_user(self):
+        response = self.client_api().get(f"{self.get_base_endpoint()}{self.get_id_from_another_user()}",
+                                         headers=self.get_authentication_header())
+        self.assertEqual(403, response.status_code)
 
     def test_find_all(self):
-        response = self.client_api().get(self.get_base_endpoint())
+        response = self.client_api().get(self.get_base_endpoint(), headers=self.get_authentication_header())
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(200, response.status_code)
         self.assertEqual(self.amount_register_items(), len(response_dto))
         [self.__assert_each_item(item) for item in response_dto]
 
+    def test_find_all_without_login(self):
+        response = self.client_api().get(self.get_base_endpoint())
+        self.assertEqual(401, response.status_code)
+
     def test_create(self):
         item_to_create = self.get_item_to_create()
-        response = self.client_api().post(self.get_base_endpoint(), json=item_to_create)
+        response = self.client_api().post(self.get_base_endpoint(), json=item_to_create,
+                                          headers=self.get_authentication_header())
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(200, response.status_code)
 
         self.__assert_equal_item(item_to_create, response_dto)
 
+    def test_create_without_login(self):
+        item_to_create = self.get_item_to_create()
+        response = self.client_api().post(self.get_base_endpoint(), json=item_to_create)
+        self.assertEqual(401, response.status_code)
+
     def test_invalid_creation(self):
         item_to_create = self.get_invalid_item_to_create()
-        response = self.client_api().post(self.get_base_endpoint(), json=item_to_create)
+        response = self.client_api().post(self.get_base_endpoint(), json=item_to_create,
+                                          headers=self.get_authentication_header())
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(400, response.status_code)
@@ -82,39 +107,69 @@ class GenericControllerTest(metaclass=abc.ABCMeta):
 
     def test_update(self):
         item_to_update = self.get_item_to_create()
-        item_to_update["id"] = self.get_existing_id()
+        item_to_update["id"] = self.get_default_id()
 
-        response = self.client_api().put(f"{self.get_base_endpoint()}{self.default_id}", json=item_to_update)
+        response = self.client_api().put(f"{self.get_base_endpoint()}{self.get_default_id()}", json=item_to_update,
+                                         headers=self.get_authentication_header())
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(200, response.status_code)
         self.__assert_equal_item(item_to_update, response_dto)
 
+    def test_update_without_login(self):
+        item_to_update = self.get_item_to_create()
+        item_to_update["id"] = self.get_default_id()
+
+        response = self.client_api().put(f"{self.get_base_endpoint()}{self.get_default_id()}", json=item_to_update)
+
+        self.assertEqual(401, response.status_code)
+
+    def test_update_from_another_user(self):
+        item_to_update = self.get_item_to_create()
+
+        response = self.client_api().put(f"{self.get_base_endpoint()}{self.get_id_from_another_user()}",
+                                         json=item_to_update, headers=self.get_authentication_header())
+
+        self.assertEqual(403, response.status_code)
+
     def test_invalid_update(self):
         item_to_update = self.get_invalid_item_to_create()
-        item_to_update["id"] = self.get_existing_id()
+        item_to_update["id"] = self.get_default_id()
 
-        response = self.client_api().put(f"{self.get_base_endpoint()}{self.default_id}", json=item_to_update)
+        response = self.client_api().put(f"{self.get_base_endpoint()}{self.get_default_id()}", json=item_to_update,
+                                         headers=self.get_authentication_header())
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(400, response.status_code)
         self.assertEqual("InvalidEntityException", response_dto["type"])
 
     def test_delete(self):
-        response = self.client_api().get(f"{self.get_base_endpoint()}{self.default_id}")
+        response = self.client_api().get(f"{self.get_base_endpoint()}{self.get_default_id()}",
+                                         headers=self.get_authentication_header())
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(200, response.status_code)
         self.assertIsNotNone(response_dto)
 
-        response = self.client_api().delete(f"{self.get_base_endpoint()}{self.default_id}")
+        response = self.client_api().delete(f"{self.get_base_endpoint()}{self.get_default_id()}",
+                                            headers=self.get_authentication_header())
         self.assertEqual(204, response.status_code)
 
-        response = self.client_api().get(f"{self.get_base_endpoint()}{self.default_id}")
+        response = self.client_api().get(f"{self.get_base_endpoint()}{self.get_default_id()}",
+                                         headers=self.get_authentication_header())
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(200, response.status_code)
         self.assertIsNone(response_dto)
+
+    def test_delete_without_delete(self):
+        response = self.client_api().delete(f"{self.get_base_endpoint()}{self.get_default_id()}")
+        self.assertEqual(401, response.status_code)
+
+    def test_delete_from_another_user(self):
+        response = self.client_api().delete(f"{self.get_base_endpoint()}{self.get_id_from_another_user()}",
+                                            headers=self.get_authentication_header())
+        self.assertEqual(403, response.status_code)
 
     def __assert_equal_item(self, item_a: dict, item_b: dict):
         for key, value in item_a.items():
