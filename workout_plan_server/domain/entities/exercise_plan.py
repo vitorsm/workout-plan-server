@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import List
+from datetime import datetime
+from typing import List, Optional
 
 from workout_plan_server.domain.entities.exercise import Exercise
 
@@ -9,6 +10,7 @@ class ExerciseConfig(object):
     sets: int
     repetitions: int
     weight: float
+    start_date: Optional[datetime]
 
 
 @dataclass
