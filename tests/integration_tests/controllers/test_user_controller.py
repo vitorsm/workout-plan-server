@@ -23,7 +23,7 @@ class TestUserController(BaseTest):
         response = self.client.post(f"/v1/user/", json=user_dto)
         response_dto = json.loads(response.data.decode())
 
-        self.assertEqual(200, response.status_code)
+        self.assertEqual(201, response.status_code)
         self.assertIsNotNone(response_dto["id"])
         self.assertEqual(user_dto["name"], response_dto["name"])
         self.assertEqual(user_dto["login"], response_dto["login"])
