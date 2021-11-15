@@ -18,7 +18,7 @@ jobs:
           path: './tests/'
           test_dir: '.'
           pattern: 'test_*.py'
-          python_path: '../../'
+          python_path: '../'
 
   upload-coverage-data:
     runs-on: ubuntu-latest
