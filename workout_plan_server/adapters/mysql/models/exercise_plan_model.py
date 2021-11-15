@@ -108,10 +108,6 @@ class ExercisePlanModel(BaseModel):
 class ExerciseTrainingModel(BaseModel):
     __tablename__ = "exercise_training"
 
-    sets = Column(Integer, nullable=False)
-    repetitions = Column(Integer, nullable=False)
-    weight = Column(Float, nullable=False)
-
     @declared_attr
     def exercise_id(self):
         return Column(String, ForeignKey("exercise.id"), nullable=False, primary_key=True)
@@ -119,6 +115,10 @@ class ExerciseTrainingModel(BaseModel):
     @declared_attr
     def training_id(self):
         return Column(String, ForeignKey("training.id"), nullable=False, primary_key=True)
+
+    sets = Column(Integer, nullable=False)
+    repetitions = Column(Integer, nullable=False)
+    weight = Column(Float, nullable=False)
 
     @declared_attr
     def exercise(self):
