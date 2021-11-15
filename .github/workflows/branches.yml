@@ -37,8 +37,8 @@ jobs:
           pip3 install coverage
           pip3 install -r requirements.txt
           cd tests/
-          sudo mkdir /var/log/workout-plan
-          sudo chmod 777 /var/log/workout-plan
+          sudo mkdir /var/log/workout-plan-server
+          sudo chmod 777 /var/log/workout-plan-server
           PYTHONPATH=../ coverage run --branch --source=../ --omit=./* -m unittest discover -s .
           coverage xml
       - name: Upload coverage to Codecov
