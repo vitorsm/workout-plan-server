@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Column, String, ForeignKey, Integer, Float, DateTime
+from sqlalchemy import Column, String, ForeignKey, Integer, Float, DateTime, ForeignKeyConstraint
 from sqlalchemy.orm import relationship, declared_attr
 
 from workout_plan_server.adapters.mysql.models import BaseModel
@@ -11,45 +11,13 @@ from workout_plan_server.domain.entities.training import Training
 from workout_plan_server.domain.entities.workout_plan import WorkoutPlan
 
 
-class HistoryExercisePlanModel(BaseModel):
-    __tablename__ = "history_exercise_plan"
+class ExercisePlanModel(BaseModel):
+    __tablename__ = "exercise_plan"
 
-    @declared_attr
-    def exercise_id(self):
-        return Column(String, ForeignKey("exercise_plan.exercise_id"), nullable=False, primary_key=True)
-
-    @declared_attr
-    def workout_plan_id(self):
-        return Column(String, ForeignKey("exercise_plan.workout_plan_id"), nullable=False, primary_key=True)
-
-    # exercise_id = Column(String, ForeignKey("exercise_plan.id"), nullable=False, primary_key=True)
-    # workout_plan_id = Column(String, ForeignKey("workout_plan.id"), nullable=False, primary_key=True)
-    start_date = Column(DateTime, nullable=False, default=datetime.utcnow, primary_key=True)
     sets = Column(Integer, nullable=False)
     repetitions = Column(Integer, nullable=False)
     weight = Column(Float, nullable=False)
-
-    def __eq__(self, other):
-        return other and self.exercise_id == other.exercise_id and self.workout_plan_id == other.workout_plan_id \
-               and self.start_date == other.start_date
-
-    @staticmethod
-    def instantiate(exercise_config: ExerciseConfig, exercise: Exercise, workout_plan: WorkoutPlan):
-        history_exercise = HistoryExercisePlanModel()
-        history_exercise.exercise_id = exercise.id
-        history_exercise.workout_plan_id = workout_plan.id
-        history_exercise.start_date = exercise_config.start_date
-        history_exercise.sets = exercise_config.sets
-        history_exercise.repetitions = exercise_config.repetitions
-        history_exercise.weight = exercise_config.weight
-
-        return history_exercise
-
-
-class ExercisePlanModel(BaseModel):
-    __tablename__ = "exercise_plan"
-    # exercise_id = Column(String, ForeignKey("exercise.id"), nullable=False, primary_key=True)
-    # workout_plan_id = Column(String, ForeignKey("workout_plan.id"), nullable=False, primary_key=True)
+    start_date = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     @declared_attr
     def exercise_id(self):
@@ -59,12 +27,9 @@ class ExercisePlanModel(BaseModel):
     def workout_plan_id(self):
         return Column(String, ForeignKey("workout_plan.id"), nullable=False, primary_key=True)
 
-    sets = Column(Integer, nullable=False)
-    repetitions = Column(Integer, nullable=False)
-    weight = Column(Float, nullable=False)
-    start_date = Column(DateTime, nullable=False, default=datetime.utcnow)
-
-    # history_exercise_config = relationship("HistoryExercisePlanModel", cascade="all, delete-orphan", lazy="select")
+    @declared_attr
+    def workout_plan(self):
+        return relationship("WorkoutPlanModel", lazy="select")
 
     @declared_attr
     def history_exercise_config(self):
@@ -105,6 +70,42 @@ class ExercisePlanModel(BaseModel):
                             history_exercise_config=history_exercise_config)
 
 
+class HistoryExercisePlanModel(BaseModel):
+    __tablename__ = "history_exercise_plan"
+
+    start_date = Column(DateTime, nullable=False, default=datetime.utcnow, primary_key=True)
+    sets = Column(Integer, nullable=False)
+    repetitions = Column(Integer, nullable=False)
+    weight = Column(Float, nullable=False)
+
+    @declared_attr
+    def exercise_id(self):
+        return Column(String, nullable=False, primary_key=True)
+
+    @declared_attr
+    def workout_plan_id(self):
+        return Column(String, nullable=False, primary_key=True)
+
+    __table_args__ = (ForeignKeyConstraint(["workout_plan_id", "exercise_id"],
+                                           [ExercisePlanModel.workout_plan_id, ExercisePlanModel.exercise_id]), {})
+
+    def __eq__(self, other):
+        return other and self.exercise_id == other.exercise_id and self.workout_plan_id == other.workout_plan_id \
+               and self.start_date == other.start_date
+
+    @staticmethod
+    def instantiate(exercise_config: ExerciseConfig, exercise: Exercise, workout_plan: WorkoutPlan):
+        history_exercise = HistoryExercisePlanModel()
+        history_exercise.exercise_id = exercise.id
+        history_exercise.workout_plan_id = workout_plan.id
+        history_exercise.start_date = exercise_config.start_date
+        history_exercise.sets = exercise_config.sets
+        history_exercise.repetitions = exercise_config.repetitions
+        history_exercise.weight = exercise_config.weight
+
+        return history_exercise
+
+
 class ExerciseTrainingModel(BaseModel):
     __tablename__ = "exercise_training"
 
@@ -115,6 +116,10 @@ class ExerciseTrainingModel(BaseModel):
     @declared_attr
     def training_id(self):
         return Column(String, ForeignKey("training.id"), nullable=False, primary_key=True)
+
+    @declared_attr
+    def training(self):
+        return relationship("TrainingModel", lazy="select")
 
     sets = Column(Integer, nullable=False)
     repetitions = Column(Integer, nullable=False)

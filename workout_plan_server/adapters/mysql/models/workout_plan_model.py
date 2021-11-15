@@ -14,11 +14,10 @@ class WorkoutPlanModel(BaseModel, GenericModel):
     __tablename__ = "workout_plan"
     start_date = Column(DateTime, nullable=False, default=datetime.utcnow, primary_key=True)
     end_date = Column(DateTime, default=datetime.utcnow, primary_key=True)
-    # exercises = relationship("ExerciseTrainingModel", cascade="all, delete-orphan")
 
     @declared_attr
     def exercises(self):
-        return relationship("ExerciseTrainingModel", cascade="all, delete-orphan")
+        return relationship("ExercisePlanModel", cascade="all, delete-orphan", back_populates="workout_plan")
 
     @staticmethod
     def from_entity(entity: Optional[WorkoutPlan]):
