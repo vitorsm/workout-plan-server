@@ -13,13 +13,12 @@ from workout_plan_server.domain.entities.training import Training
 class TrainingModel(BaseModel, GenericModel):
     __tablename__ = "training"
 
+    start_date = Column(DateTime, nullable=False, default=datetime.utcnow)
+    end_date = Column(DateTime, default=datetime.utcnow)
+
     @declared_attr
     def workout_plan_id(self):
         return Column(String, ForeignKey("workout_plan.id"))
-
-    # workout_plan_id = Column(String, ForeignKey("workout_plan.id"))
-    start_date = Column(DateTime, nullable=False, default=datetime.utcnow)
-    end_date = Column(DateTime, default=datetime.utcnow)
 
     @declared_attr
     def exercises(self):
@@ -28,9 +27,6 @@ class TrainingModel(BaseModel, GenericModel):
     @declared_attr
     def workout_plan(self):
         return relationship("WorkoutPlanModel", lazy="select")
-
-    # exercises = relationship("ExerciseTrainingModel", cascade="all, delete-orphan", lazy="select")
-    # workout_plan = relationship("WorkoutPlanModel", lazy="select")
 
     @staticmethod
     def from_entity(entity: Optional[Training]):

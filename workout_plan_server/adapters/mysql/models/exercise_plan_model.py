@@ -16,11 +16,11 @@ class HistoryExercisePlanModel(BaseModel):
 
     @declared_attr
     def exercise_id(self):
-        return Column(String, ForeignKey("exercise_plan.id"), nullable=False, primary_key=True)
+        return Column(String, ForeignKey("exercise_plan.exercise_id"), nullable=False, primary_key=True)
 
     @declared_attr
     def workout_plan_id(self):
-        return Column(String, ForeignKey("exercise_plan.id"), nullable=False, primary_key=True)
+        return Column(String, ForeignKey("exercise_plan.workout_plan_id"), nullable=False, primary_key=True)
 
     # exercise_id = Column(String, ForeignKey("exercise_plan.id"), nullable=False, primary_key=True)
     # workout_plan_id = Column(String, ForeignKey("workout_plan.id"), nullable=False, primary_key=True)
@@ -107,8 +107,10 @@ class ExercisePlanModel(BaseModel):
 
 class ExerciseTrainingModel(BaseModel):
     __tablename__ = "exercise_training"
-    # exercise_id = Column(String, ForeignKey("exercise.id"), nullable=False, primary_key=True)
-    # training_id = Column(String, ForeignKey("training.id"), nullable=False, primary_key=True)
+
+    sets = Column(Integer, nullable=False)
+    repetitions = Column(Integer, nullable=False)
+    weight = Column(Float, nullable=False)
 
     @declared_attr
     def exercise_id(self):
@@ -117,12 +119,6 @@ class ExerciseTrainingModel(BaseModel):
     @declared_attr
     def training_id(self):
         return Column(String, ForeignKey("training.id"), nullable=False, primary_key=True)
-
-    sets = Column(Integer, nullable=False)
-    repetitions = Column(Integer, nullable=False)
-    weight = Column(Float, nullable=False)
-
-    # exercise = relationship("ExerciseModel", lazy="select")
 
     @declared_attr
     def exercise(self):
