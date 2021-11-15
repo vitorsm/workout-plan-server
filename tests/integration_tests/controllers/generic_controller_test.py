@@ -1,32 +1,54 @@
 import abc
 import json
 
-from tests.integration_tests.base_test import BaseTest
 
-
-class TestGenericController(BaseTest, metaclass=abc.ABCMeta):
+class GenericControllerTest(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_entity_path(self) -> str:
         raise NotImplementedError
 
+    @abc.abstractmethod
     def amount_register_items(self) -> int:
         raise NotImplementedError
 
+    @abc.abstractmethod
     def get_item_to_create(self) -> dict:
         raise NotImplementedError
 
+    @abc.abstractmethod
     def get_invalid_item_to_create(self) -> dict:
         raise NotImplementedError
 
+    @abc.abstractmethod
     def get_existing_id(self) -> str:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def get_default_id(self) -> str:
         raise NotImplementedError
 
     def get_base_endpoint(self) -> str:
         return f"/v1/{self.get_entity_path()}/"
 
+    @abc.abstractmethod
+    def client_api(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def assertEqual(self, expected, actual):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def assertIsNotNone(self, item):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def assertIsNone(self, item):
+        raise NotImplementedError
+
     def test_find_by_id(self):
-        response = self.client.get(f"{self.get_base_endpoint()}{self.default_id}")
+        response = self.client_api().get(f"{self.get_base_endpoint()}{self.default_id}")
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(200, response.status_code)
@@ -34,7 +56,7 @@ class TestGenericController(BaseTest, metaclass=abc.ABCMeta):
         self.assertEqual(self.default_id, response_dto["id"])
 
     def test_find_all(self):
-        response = self.client.get(self.get_base_endpoint())
+        response = self.client_api().get(self.get_base_endpoint())
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(200, response.status_code)
@@ -43,7 +65,7 @@ class TestGenericController(BaseTest, metaclass=abc.ABCMeta):
 
     def test_create(self):
         item_to_create = self.get_item_to_create()
-        response = self.client.post(self.get_base_endpoint(), json=item_to_create)
+        response = self.client_api().post(self.get_base_endpoint(), json=item_to_create)
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(200, response.status_code)
@@ -52,7 +74,7 @@ class TestGenericController(BaseTest, metaclass=abc.ABCMeta):
 
     def test_invalid_creation(self):
         item_to_create = self.get_invalid_item_to_create()
-        response = self.client.post(self.get_base_endpoint(), json=item_to_create)
+        response = self.client_api().post(self.get_base_endpoint(), json=item_to_create)
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(400, response.status_code)
@@ -62,7 +84,7 @@ class TestGenericController(BaseTest, metaclass=abc.ABCMeta):
         item_to_update = self.get_item_to_create()
         item_to_update["id"] = self.get_existing_id()
 
-        response = self.client.put(f"{self.get_base_endpoint()}{self.default_id}", json=item_to_update)
+        response = self.client_api().put(f"{self.get_base_endpoint()}{self.default_id}", json=item_to_update)
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(200, response.status_code)
@@ -72,23 +94,23 @@ class TestGenericController(BaseTest, metaclass=abc.ABCMeta):
         item_to_update = self.get_invalid_item_to_create()
         item_to_update["id"] = self.get_existing_id()
 
-        response = self.client.put(f"{self.get_base_endpoint()}{self.default_id}", json=item_to_update)
+        response = self.client_api().put(f"{self.get_base_endpoint()}{self.default_id}", json=item_to_update)
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(400, response.status_code)
         self.assertEqual("InvalidEntityException", response_dto["type"])
 
     def test_delete(self):
-        response = self.client.get(f"{self.get_base_endpoint()}{self.default_id}")
+        response = self.client_api().get(f"{self.get_base_endpoint()}{self.default_id}")
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(200, response.status_code)
         self.assertIsNotNone(response_dto)
 
-        response = self.client.delete(f"{self.get_base_endpoint()}{self.default_id}")
+        response = self.client_api().delete(f"{self.get_base_endpoint()}{self.default_id}")
         self.assertEqual(204, response.status_code)
 
-        response = self.client.get(f"{self.get_base_endpoint()}{self.default_id}")
+        response = self.client_api().get(f"{self.get_base_endpoint()}{self.default_id}")
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(200, response.status_code)

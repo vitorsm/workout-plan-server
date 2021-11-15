@@ -1,7 +1,15 @@
-from tests.integration_tests.controllers.test_generic_controller import TestGenericController
+from tests.integration_tests.base_test import BaseTest
+from tests.integration_tests.controllers.generic_controller_test import GenericControllerTest
 
 
-class TestExerciseController(TestGenericController):
+class TestExerciseController(BaseTest, GenericControllerTest):
+
+    def get_default_id(self) -> str:
+        return self.default_id
+
+    def client_api(self):
+        return self.client
+
     def get_entity_path(self) -> str:
         return "exercise"
 
