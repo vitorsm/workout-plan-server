@@ -6,19 +6,19 @@ on:
       - '**'
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Prepare repo
-        uses: actions/checkout@master
-      - name: Test
-        uses: vitorsm/python-test-action@master
-        with:
-          deps_list: '../requirements.txt'
-          path: './tests/'
-          test_dir: '.'
-          pattern: 'test_*.py'
-          python_path: '../'
+#  test:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Prepare repo
+#        uses: actions/checkout@master
+#      - name: Test
+#        uses: vitorsm/python-test-action@master
+#        with:
+#          deps_list: '../requirements.txt'
+#          path: './tests/'
+#          test_dir: '.'
+#          pattern: 'test_*.py'
+#          python_path: '../'
 
   upload-coverage-data:
     runs-on: ubuntu-latest
