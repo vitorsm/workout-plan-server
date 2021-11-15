@@ -1,0 +1,9 @@
+
+
+INSERT INTO user (id, name, login, password) VALUES ('00000000-0000-0000-0000-000000000001', 'Admin', 'admin', 'admin');
+
+INSERT INTO exercise (id, name, created_by_id, created_at, modified_at, exercise_type, body_type) VALUES (
+    '00000000-0000-0000-0000-000000000001', 'Exercise 1', '00000000-0000-0000-0000-000000000001', '2021-01-01 10:00:00.00000', '2021-01-01 10:00:00.00000', 'CARDIO', 'UPPER'
+), (
+    '00000000-0000-0000-0000-000000000002', 'Exercise 2', '00000000-0000-0000-0000-000000000001', '2021-01-01 10:00:00.00000', '2021-01-01 10:00:00.00000', 'MUSCLE', 'LOWER'
+);
