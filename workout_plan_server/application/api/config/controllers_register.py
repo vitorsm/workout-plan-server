@@ -5,4 +5,3 @@ from workout_plan_server.application.api.controllers.exercise_controller import 
 
 def register_controllers(app: Flask):
     app.register_blueprint(exercise_controller)
-

@@ -1,3 +1,4 @@
+import logging
 import os
 
 HOST_PORT = 5000
@@ -27,3 +28,5 @@ HOURS_TO_EXPIRATION_TOKEN = int(os.environ.get("HOURS_TO_EXPIRATION_TOKEN", "12"
 # ======================================================================================================
 
 LOG_REPOSITORY = "/var/log/workout-plan-server"
+# [INFO, WARNING, ERROR]
+LOG_LEVEL = int(os.environ.get("LOG_LEVEL", str(logging.INFO)))

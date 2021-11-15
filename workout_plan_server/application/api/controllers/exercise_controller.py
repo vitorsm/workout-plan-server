@@ -1,9 +1,11 @@
 from flask import Blueprint, request, jsonify
 
+from workout_plan_server.application.api.config.errors_handler import fill_error_handlers_to_controller
 from workout_plan_server.application.api.mapper.exercise_mapper import ExerciseMapper
 from workout_plan_server.services.impl.exercise_service import ExerciseService
 
 exercise_controller = Blueprint("exercise_controller", __name__, url_prefix="/v1/exercise")
+fill_error_handlers_to_controller(exercise_controller)
 
 
 @exercise_controller.route("/", methods=["POST"])
