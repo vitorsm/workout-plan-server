@@ -12,3 +12,11 @@ class UserRepository(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def find_by_id(self, user_id: str) -> User:
         raise NotImplementedError
+
+    @abc.abstractmethod
+    def create(self, user: User) -> User:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def update(self, user: User):
+        raise NotImplementedError

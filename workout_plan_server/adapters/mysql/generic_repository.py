@@ -44,7 +44,10 @@ class GenericRepository(Generic[Entity]):
 
         self.db.session.merge(model)
         if commit:
-            self.db.session.commit()
+            try:
+                self.commit(raise_integrity_error=True)
+            except IntegrityError as ex:
+                self.__handle_integrity_error(ex, type(entity).__name__)
 
     def delete(self, entity: object, commit: bool = True):
         self.db.session.query(self.entity_type).filter(self.entity_type.id == entity.id).delete()

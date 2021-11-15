@@ -6,6 +6,7 @@ from workout_plan_server.adapters.mysql.impl.mysql_exercise_repository import My
 from workout_plan_server.adapters.mysql.impl.mysql_user_repository import MySQLUserRepository
 from workout_plan_server.application.api.flask_authentication_repository import FlaskAuthenticationRepository
 from workout_plan_server.services.impl.exercise_service import ExerciseService
+from workout_plan_server.services.impl.user_service import UserService
 from workout_plan_server.services.ports.exercise_repository import ExerciseRepository
 from workout_plan_server.services.ports.user_repository import UserRepository
 
@@ -25,6 +26,7 @@ class DependenciesInjector(Module):
         authentication_repository = FlaskAuthenticationRepository()
 
         exercise_service = ExerciseService(authentication_repository, exercise_repository)
+        user_service = UserService(user_repository, authentication_repository)
 
         # Repositories
         binder.bind(ExerciseRepository, to=exercise_repository, scope=singleton)
@@ -32,3 +34,4 @@ class DependenciesInjector(Module):
 
         # Services
         binder.bind(ExerciseService, to=exercise_service, scope=singleton)
+        binder.bind(UserService, to=user_service, scope=singleton)
