@@ -7,4 +7,7 @@ def get_project_dir() -> str:
     dir_path = os.getcwd()
     result = dir_path.split("workout-plan-server")[0] + "workout-plan-server"
 
+    if "/home/runner/work/workout-plan-server" in result:
+        result += "/workout-plan-server"
+
     return result
