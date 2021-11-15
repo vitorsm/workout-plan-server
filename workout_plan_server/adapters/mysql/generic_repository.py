@@ -1,6 +1,9 @@
-from typing import TypeVar, Generic, List
+from typing import TypeVar, Generic, List, Optional
+from uuid import uuid4
 
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import DeclarativeMeta
 
 from workout_plan_server.adapters.utils import sql_utils
 from workout_plan_server.domain.entities.user import User
@@ -10,8 +13,9 @@ Entity = TypeVar("Entity")
 
 
 class GenericRepository(Generic[Entity]):
-    def __init__(self, db):
+    def __init__(self, db: SQLAlchemy, entity_type: DeclarativeMeta):
         self.db = db
+        self.entity_type = entity_type
 
     def commit(self, raise_integrity_error: bool = False):
         try:
@@ -22,27 +26,42 @@ class GenericRepository(Generic[Entity]):
             else:
                 self.__handle_integrity_error(ex, "")
 
-    def add(self, entity: object, commit: bool = False):
-        self.db.session.add(entity)
+    def create(self, entity: Entity, commit: bool = True) -> Entity:
+        model = self.entity_type.from_entity(entity)
+        model.id = str(uuid4())
+
+        self.db.session.add(model)
         if commit:
             try:
                 self.commit(raise_integrity_error=True)
             except IntegrityError as ex:
                 self.__handle_integrity_error(ex, type(entity).__name__)
 
-    def update(self, entity: object, commit: bool = False):
-        if entity not in self.db.session:
-            self.db.session.add(entity)
+        return model.to_entity()
+
+    def update(self, entity: object, commit: bool = True):
+        model = self.entity_type.from_entity(entity)
+
+        self.db.session.merge(model)
         if commit:
             self.db.session.commit()
 
-    def delete(self, entity: object, commit: bool = False):
-        self.db.session.delete(entity)
+    def delete(self, entity: object, commit: bool = True):
+        self.db.session.query(self.entity_type).filter(self.entity_type.id == entity.id).delete()
         if commit:
             self.commit()
 
-    def find_by_user(self, user: User) -> List[Entity]:
-        return self.db.session.query(Entity).filter(Entity.created_by == user).all()
+    def find_all_by_user(self, user: User) -> List[Entity]:
+        models = self.db.session.query(self.entity_type).filter(self.entity_type.created_by_id == user.id).all()
+        return [model.to_entity() for model in models]
+
+    def find_by_id(self, entity_id: str) -> Optional[Entity]:
+        model = self.db.session.query(self.entity_type).filter(self.entity_type.id == entity_id).first()
+
+        if not model:
+            return None
+
+        return model.to_entity()
 
     @staticmethod
     def __handle_integrity_error(exception: IntegrityError, entity: str):

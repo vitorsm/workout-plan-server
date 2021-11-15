@@ -1,20 +1,27 @@
 from datetime import datetime
 
 from sqlalchemy import Column, String, ForeignKey, DateTime
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, declared_attr
 
-from workout_plan_server.adapters.mysql.models import BaseModel
 from workout_plan_server.domain.entities.generic_entity import GenericEntity
 
+# this import ensure that userModel will be imported before use of created_by
+from workout_plan_server.adapters.mysql.models.user_model import UserModel
 
-class GenericModel(BaseModel):
+
+class GenericModel(object):
     id = Column(String, nullable=False, primary_key=True)
     name = Column(String, nullable=False)
-    created_by_id = Column(String, ForeignKey("user.id"), nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     modified_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
-    created_by = relationship("User", lazy="select")
+    @declared_attr
+    def created_by_id(self):
+        return Column(String, ForeignKey("user.id"), nullable=False)
+
+    @declared_attr
+    def created_by(self):
+        return relationship("UserModel", lazy="select")
 
     def __eq__(self, other):
         return other and self.id == other.id

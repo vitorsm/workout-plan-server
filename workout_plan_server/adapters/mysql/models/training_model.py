@@ -2,21 +2,35 @@ from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import Column, String, ForeignKey, DateTime
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, declared_attr
 
+from workout_plan_server.adapters.mysql.models import BaseModel
 from workout_plan_server.adapters.mysql.models.exercise_plan_model import ExerciseTrainingModel
 from workout_plan_server.adapters.mysql.models.generic_model import GenericModel
 from workout_plan_server.domain.entities.training import Training
 
 
-class TrainingModel(GenericModel):
+class TrainingModel(BaseModel, GenericModel):
     __tablename__ = "training"
-    workout_plan_id = Column(String, ForeignKey("workout_plan.id"))
+
+    @declared_attr
+    def workout_plan_id(self):
+        return Column(String, ForeignKey("workout_plan.id"))
+
+    # workout_plan_id = Column(String, ForeignKey("workout_plan.id"))
     start_date = Column(DateTime, nullable=False, default=datetime.utcnow)
     end_date = Column(DateTime, default=datetime.utcnow)
 
-    exercises = relationship("ExerciseTrainingModel", cascade="all, delete-orphan", lazy="select")
-    workout_plan = relationship("WorkoutPlanModel", lazy="select")
+    @declared_attr
+    def exercises(self):
+        return relationship("ExerciseTrainingModel", cascade="all, delete-orphan", lazy="select")
+
+    @declared_attr
+    def workout_plan(self):
+        return relationship("WorkoutPlanModel", lazy="select")
+
+    # exercises = relationship("ExerciseTrainingModel", cascade="all, delete-orphan", lazy="select")
+    # workout_plan = relationship("WorkoutPlanModel", lazy="select")
 
     @staticmethod
     def from_entity(entity: Optional[Training]):

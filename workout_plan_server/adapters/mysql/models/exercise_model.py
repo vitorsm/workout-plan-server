@@ -2,11 +2,12 @@ from typing import Optional
 
 from sqlalchemy import Column, String
 
+from workout_plan_server.adapters.mysql.models import BaseModel
 from workout_plan_server.adapters.mysql.models.generic_model import GenericModel
 from workout_plan_server.domain.entities.exercise import Exercise
 
 
-class ExerciseModel(GenericModel):
+class ExerciseModel(BaseModel, GenericModel):
     __tablename__ = "exercise"
     exercise_type = Column(String, nullable=False)
     body_type = Column(String, nullable=False)
@@ -20,6 +21,8 @@ class ExerciseModel(GenericModel):
         exercise_model.generic_from_entity(entity)
         exercise_model.exercise_type = entity.exercise_type.name
         exercise_model.body_type = entity.body_type.name
+
+        return exercise_model
 
     def to_entity(self, fetch_created_by: bool = True) -> Exercise:
         exercise = Exercise(Exercise.instantiate_exercise_type_by_name(self.exercise_type),

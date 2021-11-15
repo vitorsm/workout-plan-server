@@ -1,5 +1,5 @@
 import abc
-from typing import Optional
+from typing import Optional, List
 
 from workout_plan_server.domain.entities.generic_entity import GenericEntity
 from workout_plan_server.domain.entities.user import User
@@ -30,6 +30,13 @@ class GenericEntityService(metaclass=abc.ABCMeta):
         return self.get_repository().create(entity)
 
     def update(self, entity: GenericEntity):
+        persisted_entity = self.find_by_id(entity.id)
+
+        if not persisted_entity:
+            raise EntityNotFoundException(self.get_entity_name(), entity.id)
+
+        GenericEntityService.__merge_persisted_entity(persisted_entity, entity)
+
         self.__prepare_to_persist(entity)
         self.__valid_to_persist(entity, to_delete=False)
         self.get_repository().update(entity)
@@ -48,9 +55,17 @@ class GenericEntityService(metaclass=abc.ABCMeta):
         user = self.authentication_repository.get_current_user()
 
         entity = self.get_repository().find_by_id(entity_id)
+
+        if not entity:
+            return None
+
         GenericEntityService.__assert_entity_user(entity, user)
 
         return entity
+
+    def find_all_by_user(self) -> List[GenericEntity]:
+        user = self.authentication_repository.get_current_user()
+        return self.get_repository().find_all_by_user(user)
 
     def valid_required_fields(self, entity: GenericEntity):
         missing_fields = entity.get_missing_fields()
@@ -69,6 +84,16 @@ class GenericEntityService(metaclass=abc.ABCMeta):
 
         if not to_delete:
             self.valid_required_fields(entity)
+
+    @staticmethod
+    def __merge_persisted_entity(persisted_entity: GenericEntity, entity: GenericEntity):
+        if not persisted_entity:
+            return
+
+        entity.id = persisted_entity.id
+        entity.created_at = persisted_entity.created_at
+        entity.modified_at = persisted_entity.modified_at
+        entity.created_by = persisted_entity.created_by
 
     @staticmethod
     def __assert_entity_user(entity: GenericEntity, user: User):
