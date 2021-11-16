@@ -13,7 +13,7 @@ class ExercisePlanMapper(object):
             return None
 
         exercise = ExerciseMapper.to_entity(dto.get("exercise"))
-        current_exercise_config = ExercisePlanMapper.__exercise_config_to_entity(dto)
+        current_exercise_config = ExercisePlanMapper.__exercise_config_to_entity(dto.get("current_exercise_config"))
         history_exercise_config = [ExercisePlanMapper.__exercise_config_to_entity(hec)
                                    for hec in dto.get("history_exercise_config")] \
             if dto.get("history_exercise_config") else None
@@ -28,7 +28,8 @@ class ExercisePlanMapper(object):
 
         exercise_config = ExercisePlanMapper.__exercise_config_to_dict(exercise_plan.current_exercise_config)
         history_exercise_config = [ExercisePlanMapper.__exercise_config_to_dict(hec)
-                                   for hec in exercise_plan.history_exercise_config]
+                                   for hec in exercise_plan.history_exercise_config] \
+            if exercise_plan.history_exercise_config else None
 
         return {
             "exercise": ExerciseMapper.to_dto(exercise_plan.exercise),

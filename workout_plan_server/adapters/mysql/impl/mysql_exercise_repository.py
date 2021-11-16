@@ -16,10 +16,5 @@ class MySQLExerciseRepository(GenericRepository[ExerciseModel], ExerciseReposito
     def __init__(self, db: SQLAlchemy):
         super().__init__(db, ExerciseModel)
 
-    # def create(self, entity: Exercise) -> Exercise:
-    #     exercise_model = ExerciseModel.from_entity(entity)
-    #     exercise_model.id = str(uuid4())
-    #
-    #     self.add(exercise_model, commit=True)
-    #
-    #     return exercise_model.to_entity()
+    def merge_model_with_persisted_model(self, new_model: object) -> object:
+        return None

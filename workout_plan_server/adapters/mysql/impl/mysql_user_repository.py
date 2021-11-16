@@ -20,3 +20,6 @@ class MySQLUserRepository(GenericRepository[UserModel], UserRepository):
             raise InvalidCredentialsException(login)
 
         return user.to_entity()
+
+    def merge_model_with_persisted_model(self, new_model: object) -> object:
+        return None

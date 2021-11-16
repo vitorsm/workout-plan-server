@@ -35,6 +35,10 @@ class ExercisePlanModel(BaseModel):
     def history_exercise_config(self):
         return relationship("HistoryExercisePlanModel", cascade="all, delete-orphan", lazy="select")
 
+    @declared_attr
+    def exercise(self):
+        return relationship("ExerciseModel", lazy="select")
+
     def __eq__(self, other):
         return other and self.exercise_id == other.exercise_id and self.workout_plan_id == other.workout_plan_id
 

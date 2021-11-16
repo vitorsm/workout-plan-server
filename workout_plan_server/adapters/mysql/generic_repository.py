@@ -1,3 +1,4 @@
+import abc
 from typing import TypeVar, Generic, List, Optional
 from uuid import uuid4
 
@@ -12,10 +13,14 @@ from workout_plan_server.domain.exceptions.duplicate_entity_exception import Dup
 Entity = TypeVar("Entity")
 
 
-class GenericRepository(Generic[Entity]):
+class GenericRepository(Generic[Entity], metaclass=abc.ABCMeta):
     def __init__(self, db: SQLAlchemy, entity_type: DeclarativeMeta):
         self.db = db
         self.entity_type = entity_type
+
+    @abc.abstractmethod
+    def merge_model_with_persisted_model(self, new_model: object) -> object:
+        raise NotImplementedError
 
     def commit(self, raise_integrity_error: bool = False):
         try:
@@ -28,7 +33,8 @@ class GenericRepository(Generic[Entity]):
 
     def create(self, entity: Entity, commit: bool = True) -> Entity:
         model = self.entity_type.from_entity(entity)
-        model.id = str(uuid4())
+        model_id = str(uuid4())
+        model.id = model_id
 
         self.db.session.add(model)
         if commit:
@@ -37,12 +43,15 @@ class GenericRepository(Generic[Entity]):
             except IntegrityError as ex:
                 self.__handle_integrity_error(ex, type(entity).__name__)
 
-        return model.to_entity()
+        return self.find_by_id(model_id)
 
     def update(self, entity: object, commit: bool = True):
         model = self.entity_type.from_entity(entity)
+        merged_model = self.merge_model_with_persisted_model(model)
 
-        self.db.session.merge(model)
+        if not merged_model:
+            self.db.session.merge(model)
+
         if commit:
             try:
                 self.commit(raise_integrity_error=True)
@@ -58,8 +67,11 @@ class GenericRepository(Generic[Entity]):
         models = self.db.session.query(self.entity_type).filter(self.entity_type.created_by_id == user.id).all()
         return [model.to_entity() for model in models]
 
+    def find_model_by_id(self, entity_id: str) -> Optional[object]:
+        return self.db.session.query(self.entity_type).filter(self.entity_type.id == entity_id).first()
+
     def find_by_id(self, entity_id: str) -> Optional[Entity]:
-        model = self.db.session.query(self.entity_type).filter(self.entity_type.id == entity_id).first()
+        model = self.find_model_by_id(entity_id)
 
         if not model:
             return None
@@ -76,7 +88,8 @@ class GenericRepository(Generic[Entity]):
             if "UNIQUE" in exception.args[0]:
                 field = exception.args[0].split(': ')[1]
             else:
-                field = exception.args[0].split('\' for key \'')[1][:-3].split('.')[1]
+                field_name = exception.args[0].split('\' for key \'')[1][:-3].split('.')
+                field = field_name[1] if len(field_name) > 1 else "id"
             value = None
 
             if "." in field:

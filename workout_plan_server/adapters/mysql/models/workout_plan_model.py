@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from sqlalchemy import Column, DateTime
 from sqlalchemy.orm import relationship, declared_attr
@@ -34,8 +34,27 @@ class WorkoutPlanModel(BaseModel, GenericModel):
         return model
 
     def to_entity(self, fetch_history: bool = True) -> WorkoutPlan:
-        exercises_plan = [exercise_plan.to_entity(exercise_plan, fetch_history) for exercise_plan in self.exercises]
+        exercises_plan = [exercise_plan.to_entity(fetch_history) for exercise_plan in self.exercises]
         workout_plan = WorkoutPlan(exercises=exercises_plan, start_date=self.start_date, end_date=self.end_date)
         self.fill_generic_entity(workout_plan)
 
         return workout_plan
+
+    def merge_model(self, model):
+        super().merge_model(model)
+        self.start_date = model.start_date
+        self.end_date = model.end_date
+        self.merge_exercises(model.exercises)
+
+    def merge_exercises(self, exercises):
+        if not exercises:
+            self.exercises = list()
+            return
+
+        # for new_exercise in exercises:
+
+
+    @staticmethod
+    def __extract_exercise_by_id(exercises: List[ExercisePlanModel], exercise_id: str) -> Optional[ExercisePlanModel]:
+        return next((exercise for exercise in exercises if exercise.id == exercise_id), None)
+

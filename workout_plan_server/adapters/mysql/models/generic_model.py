@@ -46,3 +46,11 @@ class GenericModel(object):
             entity.created_by = self.created_by.to_entity() if self.created_by else None
 
         return entity
+
+    def merge_model(self, model):
+        self.name = model.name
+        self.created_at = model.created_at
+        self.modified_at = model.modified_at
+
+        if model.created_by:
+            self.created_by_id = model.created_by.id
