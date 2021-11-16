@@ -26,5 +26,9 @@ class EntityRepository(Generic[Entity], metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
+    def find_all_by_ids(self, entity_ids: List[str]) -> List[GenericEntity]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def find_all_by_user(self, user: User) -> List[GenericEntity]:
         raise NotImplementedError

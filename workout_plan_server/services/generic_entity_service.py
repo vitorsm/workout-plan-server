@@ -24,8 +24,8 @@ class GenericEntityService(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     def create(self, entity: GenericEntity) -> GenericEntity:
-        self.__prepare_to_persist(entity)
-        self.__valid_to_persist(entity, to_delete=False)
+        self.prepare_to_persist(entity)
+        self.valid_to_persist(entity, to_delete=False)
 
         return self.get_repository().create(entity)
 
@@ -37,8 +37,8 @@ class GenericEntityService(metaclass=abc.ABCMeta):
 
         GenericEntityService.__merge_persisted_entity(persisted_entity, entity)
 
-        self.__prepare_to_persist(entity)
-        self.__valid_to_persist(entity, to_delete=False)
+        self.prepare_to_persist(entity)
+        self.valid_to_persist(entity, to_delete=False)
         self.get_repository().update(entity)
 
     def delete(self, entity_id: str):
@@ -47,7 +47,7 @@ class GenericEntityService(metaclass=abc.ABCMeta):
         if not entity:
             raise EntityNotFoundException(self.get_entity_name(), entity_id)
 
-        self.__valid_to_persist(entity, to_delete=True)
+        self.valid_to_persist(entity, to_delete=True)
 
         self.get_repository().delete(entity)
 
@@ -73,11 +73,11 @@ class GenericEntityService(metaclass=abc.ABCMeta):
         if missing_fields:
             raise InvalidEntityException(self.get_entity_name(), missing_fields)
 
-    def __prepare_to_persist(self, entity: GenericEntity):
+    def prepare_to_persist(self, entity: GenericEntity):
         user = self.authentication_repository.get_current_user()
         entity.fill_track(user)
 
-    def __valid_to_persist(self, entity: GenericEntity, to_delete: bool):
+    def valid_to_persist(self, entity: GenericEntity, to_delete: bool):
         user = self.authentication_repository.get_current_user()
 
         GenericEntityService.__assert_entity_user(entity, user)

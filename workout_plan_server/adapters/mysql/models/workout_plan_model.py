@@ -26,6 +26,7 @@ class WorkoutPlanModel(BaseModel, GenericModel):
 
         model = WorkoutPlanModel()
         model.fill_generic_entity(entity)
+
         model.start_date = entity.start_date
         model.end_date = entity.end_date
         model.exercises = [ExercisePlanModel.from_entity(exercise_plan, entity) for exercise_plan in entity.exercises]

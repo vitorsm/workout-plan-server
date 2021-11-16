@@ -5,7 +5,7 @@ from workout_plan_server.application.api.config.errors_handler import fill_error
 from workout_plan_server.application.api.mapper.workout_plan_mapper import WorkoutPlanMapper
 from workout_plan_server.services.impl.workout_plan_service import WorkoutPlanService
 
-workout_plan_controller = Blueprint("workout_plan_controller", __name__, url_prefix="/v1/exercise")
+workout_plan_controller = Blueprint("workout_plan_controller", __name__, url_prefix="/v1/workout-plan")
 fill_error_handlers_to_controller(workout_plan_controller)
 
 

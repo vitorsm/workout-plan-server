@@ -66,6 +66,10 @@ class GenericRepository(Generic[Entity]):
 
         return model.to_entity()
 
+    def find_all_by_ids(self, entity_ids: List[str]) -> List[Entity]:
+        models = self.db.session.query(self.entity_type).filter(self.entity_type.id.in_(entity_ids)).all()
+        return [model.to_entity() for model in models]
+
     @staticmethod
     def __handle_integrity_error(exception: IntegrityError, entity: str):
         if "UNIQUE" in exception.args[0] or "Duplicate" in exception.args[0]:

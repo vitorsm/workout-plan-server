@@ -15,7 +15,8 @@ class ExercisePlanMapper(object):
         exercise = ExerciseMapper.to_entity(dto.get("exercise"))
         current_exercise_config = ExercisePlanMapper.__exercise_config_to_entity(dto)
         history_exercise_config = [ExercisePlanMapper.__exercise_config_to_entity(hec)
-                                   for hec in dto.get("history_exercise_config")]
+                                   for hec in dto.get("history_exercise_config")] \
+            if dto.get("history_exercise_config") else None
 
         return ExercisePlan(exercise=exercise, current_exercise_config=current_exercise_config,
                             history_exercise_config=history_exercise_config)

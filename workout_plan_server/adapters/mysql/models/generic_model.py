@@ -43,6 +43,6 @@ class GenericModel(object):
         entity.modified_at = self.modified_at
 
         if fetch_created_by:
-            entity.created_by = self.created_by.to_entity()
+            entity.created_by = self.created_by.to_entity() if self.created_by else None
 
         return entity

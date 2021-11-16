@@ -52,7 +52,7 @@ class ExercisePlanModel(BaseModel):
 
         exercise_plan_model.history_exercise_config = \
             [HistoryExercisePlanModel.instantiate(exercise_config, entity.exercise, workout_plan)
-             for exercise_config in entity.history_exercise_config]
+             for exercise_config in entity.history_exercise_config] if entity.history_exercise_config else list()
 
         return exercise_plan_model
 
