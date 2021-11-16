@@ -25,7 +25,7 @@ class WorkoutPlanModel(BaseModel, GenericModel):
             return None
 
         model = WorkoutPlanModel()
-        model.fill_generic_entity(entity)
+        model.generic_from_entity(entity)
 
         model.start_date = entity.start_date
         model.end_date = entity.end_date
