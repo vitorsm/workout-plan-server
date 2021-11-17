@@ -78,8 +78,10 @@ class ExercisePlanModel(BaseModel):
         self.sets = exercise_plan.sets
         self.repetitions = exercise_plan.repetitions
         self.weight = exercise_plan.weight
-        self.start_date = exercise_plan.start_date
         self.exercise_id = exercise_plan.exercise_id
+
+        if exercise_plan.start_date:
+            self.start_date = exercise_plan.start_date
 
         merge_lists(self.history_exercise_config, exercise_plan.history_exercise_config, models_to_add)
 

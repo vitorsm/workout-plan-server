@@ -25,6 +25,5 @@ def __find_item_in_list(items: list, item_to_find):
 
 
 def __remove_all_list_items(items: list):
-    count = len(items)
-    for index in range(count):
-        items.remove(0)
+    for item in items:
+        items.remove(item)
