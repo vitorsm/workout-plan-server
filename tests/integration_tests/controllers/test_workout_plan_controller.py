@@ -69,22 +69,24 @@ class TestWorkoutPlanController(BaseTest, GenericControllerTest):
         self.assertEqual(403, response.status_code)
 
     def test_update_add_exercise(self):
-        item_to_create = self.get_item_to_create()
-        exercise_plan = TestWorkoutPlanController.__get_exercise_plan()
-        item_to_create["exercises"].append(exercise_plan)
+        response = self._find_by_id()
+        item_to_update = json.loads(response.data.decode())
 
-        response = self.client_api().post(self.get_base_endpoint(), json=item_to_create,
-                                          headers=self.get_authentication_header())
+        exercise_plan = TestWorkoutPlanController.__get_exercise_plan()
+        item_to_update["exercises"].append(exercise_plan)
+
+        response = self.client_api().put(self._get_endpoint_by_id(), json=item_to_update,
+                                         headers=self.get_authentication_header())
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(200, response.status_code)
-        self.assertEqual(2, len(response_dto["exercises"]))
+        self.assertEqual(3, len(response_dto["exercises"]))
 
-        item_to_create = response_dto
-        item_to_create["exercises"] = [item_to_create["exercises"][0]]
+        item_to_update = response_dto
+        item_to_update["exercises"] = [item_to_update["exercises"][0]]
 
-        response = self.client_api().post(self.get_base_endpoint(), json=item_to_create,
-                                          headers=self.get_authentication_header())
+        response = self.client_api().put(self._get_endpoint_by_id(), json=item_to_update,
+                                         headers=self.get_authentication_header())
         response_dto = json.loads(response.data.decode())
 
         self.assertEqual(200, response.status_code)
