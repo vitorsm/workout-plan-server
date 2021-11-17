@@ -41,10 +41,13 @@ class WorkoutPlanModel(BaseModel, GenericModel):
 
         return workout_plan
 
-    def merge_model(self, model):
-        super().merge_model(model)
+    def merge_model(self, model, models_to_add: list):
+        super().merge_model(model, models_to_add)
 
         self.start_date = model.start_date
         self.end_date = model.end_date
 
-        merge_lists(self.exercises, model.exercises)
+        for exercise in model.exercises:
+            exercise.workout_plan = self
+
+        merge_lists(self.exercises, model.exercises, models_to_add)

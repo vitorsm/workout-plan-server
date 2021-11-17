@@ -74,14 +74,14 @@ class ExercisePlanModel(BaseModel):
         return ExercisePlan(exercise=self.exercise.to_entity(), current_exercise_config=exercise_config,
                             history_exercise_config=history_exercise_config)
 
-    def merge_model(self, exercise_plan):
+    def merge_model(self, exercise_plan, models_to_add: list):
         self.sets = exercise_plan.sets
         self.repetitions = exercise_plan.repetitions
         self.weight = exercise_plan.weight
         self.start_date = exercise_plan.start_date
         self.exercise_id = exercise_plan.exercise_id
 
-        merge_lists(self.history_exercise_config, exercise_plan.history_exercise_config)
+        merge_lists(self.history_exercise_config, exercise_plan.history_exercise_config, models_to_add)
 
 
 class HistoryExercisePlanModel(BaseModel):
@@ -119,7 +119,7 @@ class HistoryExercisePlanModel(BaseModel):
 
         return history_exercise
 
-    def merge_model(self, history):
+    def merge_model(self, history, models_to_add: list):
         self.start_date = history.start_date
         self.sets = history.sets
         self.repetitions = history.repetitions

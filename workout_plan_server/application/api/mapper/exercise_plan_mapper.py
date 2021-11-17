@@ -55,5 +55,5 @@ class ExercisePlanMapper(object):
             "sets": exercise_config.sets,
             "repetitions": exercise_config.repetitions,
             "weight": exercise_config.weight,
-            "start_date": exercise_config.start_date.isoformat()
+            "start_date": exercise_config.start_date.isoformat() if exercise_config.start_date else None
         }

@@ -47,7 +47,7 @@ class GenericModel(object):
 
         return entity
 
-    def merge_model(self, model):
+    def merge_model(self, model, models_to_add: list):
         self.name = model.name
         self.created_at = model.created_at
         self.modified_at = model.modified_at

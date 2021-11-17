@@ -1,6 +1,6 @@
 
 
-def merge_lists(persisted_items: list, new_items: list):
+def merge_lists(persisted_items: list, new_items: list, models_to_add: list):
     if not new_items:
         __remove_all_list_items(persisted_items)
         return
@@ -9,9 +9,9 @@ def merge_lists(persisted_items: list, new_items: list):
     for new_item in new_items:
         persisted_item = __find_item_in_list(persisted_items, new_item)
         if persisted_item:
-            persisted_item.merge_model(new_item)
+            persisted_item.merge_model(new_item, models_to_add)
         else:
-            persisted_items.append(new_item)
+            models_to_add.append(new_item)
 
     # removing items
     for persisted_item in persisted_items:

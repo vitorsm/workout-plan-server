@@ -1,5 +1,5 @@
 import abc
-from typing import TypeVar, Generic, List, Optional
+from typing import TypeVar, Generic, List, Optional, Tuple
 from uuid import uuid4
 
 from flask_sqlalchemy import SQLAlchemy
@@ -19,7 +19,7 @@ class GenericRepository(Generic[Entity], metaclass=abc.ABCMeta):
         self.entity_type = entity_type
 
     @abc.abstractmethod
-    def merge_model_with_persisted_model(self, new_model: object) -> object:
+    def merge_model_with_persisted_model(self, new_model: object) -> Tuple[object, list]:
         raise NotImplementedError
 
     def commit(self, raise_integrity_error: bool = False):
@@ -47,10 +47,14 @@ class GenericRepository(Generic[Entity], metaclass=abc.ABCMeta):
 
     def update(self, entity: object, commit: bool = True):
         model = self.entity_type.from_entity(entity)
-        merged_model = self.merge_model_with_persisted_model(model)
+        merge_result = self.merge_model_with_persisted_model(model)
 
-        if not merged_model:
+        if not merge_result:
             self.db.session.merge(model)
+        else:
+            items_to_add = merge_result[1]
+            for item_to_add in items_to_add:
+                self.db.session.add(item_to_add)
 
         if commit:
             try:
