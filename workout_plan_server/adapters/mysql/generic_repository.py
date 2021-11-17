@@ -19,7 +19,18 @@ class GenericRepository(Generic[Entity], metaclass=abc.ABCMeta):
         self.entity_type = entity_type
 
     @abc.abstractmethod
-    def merge_model_with_persisted_model(self, new_model: object) -> Tuple[object, list]:
+    def merge_model_with_persisted_model(self, new_model: object) -> Optional[Tuple[object, list]]:
+        """
+        When we need to update an object on SQLAlchemy, we can use the function merge. But if the object has a
+        one-to-many relationship (a list), we can't add more items in this list because the SQLAlchemy will try to
+        insert the parent object again.
+        In these cases, we need to get the main object from database, update its fields and add the children as objects.
+        This function must to return the persisted object updated and a list of objects that should be created.
+        If this process won't be necessary, this function must return None
+
+        :param new_model: the unattached object with the new fields
+        :return: a tuple with merged object and list of objects to create
+        """
         raise NotImplementedError
 
     def commit(self, raise_integrity_error: bool = False):

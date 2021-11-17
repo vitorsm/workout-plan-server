@@ -41,13 +41,21 @@ class WorkoutPlanModel(BaseModel, GenericModel):
 
         return workout_plan
 
-    def merge_model(self, model, models_to_add: list):
-        super().merge_model(model, models_to_add)
+    def merge_model(self, workout_plan, models_to_add: list):
+        """
+        Will update this fields from workout_plan fields. If is necessary to add a new exercise, it will be added on
+        models_to_add
 
-        self.start_date = model.start_date
-        self.end_date = model.end_date
+        :param workout_plan: the workout_plan with the new fields
+        :param models_to_add: list that will be updated with new exercise
+        """
 
-        for exercise in model.exercises:
+        super().merge_model(workout_plan, models_to_add)
+
+        self.start_date = workout_plan.start_date
+        self.end_date = workout_plan.end_date
+
+        for exercise in workout_plan.exercises:
             exercise.workout_plan = self
 
-        merge_lists(self.exercises, model.exercises, models_to_add)
+        merge_lists(self.exercises, workout_plan.exercises, models_to_add)

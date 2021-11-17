@@ -75,6 +75,14 @@ class ExercisePlanModel(BaseModel):
                             history_exercise_config=history_exercise_config)
 
     def merge_model(self, exercise_plan, models_to_add: list):
+        """
+        Will update this fields from exercise_plan fields. If is necessary to add a new history_exercise_config,
+        it will be added on models_to_add
+
+        :param exercise_plan: the exercise_plan with the new fields
+        :param models_to_add: list that will be updated with new history_exercise_config
+        """
+
         self.sets = exercise_plan.sets
         self.repetitions = exercise_plan.repetitions
         self.weight = exercise_plan.weight
@@ -122,6 +130,13 @@ class HistoryExercisePlanModel(BaseModel):
         return history_exercise
 
     def merge_model(self, history, models_to_add: list):
+        """
+        Will update this fields from history fields. The models_to_add will be ignored, it is only for the contract
+
+        :param history: the exercise_plan with the new fields
+        :param models_to_add: list that will be ignored
+        """
+
         self.start_date = history.start_date
         self.sets = history.sets
         self.repetitions = history.repetitions

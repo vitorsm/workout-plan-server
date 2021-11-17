@@ -48,6 +48,13 @@ class GenericModel(object):
         return entity
 
     def merge_model(self, model, models_to_add: list):
+        """
+        Will update this fields from model fields. If there is a one-to-many relationship,
+        and is necessary to add a new item to the list, it will be added on models_to_add.
+
+        :param model: the model with the new fields
+        :param models_to_add: list that will be updated with new models
+        """
         self.name = model.name
         self.created_at = model.created_at
         self.modified_at = model.modified_at
