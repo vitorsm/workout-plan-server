@@ -32,3 +32,10 @@ def update_exercise(workout_plan_id: str, workout_plan_service: WorkoutPlanServi
 def find_all_workout_plans(workout_plan_service: WorkoutPlanService):
     workout_plans = workout_plan_service.find_all_by_user()
     return jsonify([WorkoutPlanMapper.to_dto(workout_plan) for workout_plan in workout_plans]), 200
+
+
+@workout_plan_controller.route("<path:workout_plan_id>", methods=["GET"])
+@jwt_required()
+def find_workout_plan_by_id(workout_plan_id: str, workout_plan_service: WorkoutPlanService):
+    workout_plan = workout_plan_service.find_by_id(workout_plan_id)
+    return jsonify(WorkoutPlanMapper.to_dto(workout_plan)), 200

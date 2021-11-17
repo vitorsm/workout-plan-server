@@ -7,6 +7,7 @@ from sqlalchemy.orm import relationship, declared_attr
 from workout_plan_server.adapters.mysql.models import BaseModel
 from workout_plan_server.adapters.mysql.models.exercise_plan_model import ExercisePlanModel
 from workout_plan_server.adapters.mysql.models.generic_model import GenericModel
+from workout_plan_server.adapters.mysql.utils.model_utils import merge_lists
 from workout_plan_server.domain.entities.workout_plan import WorkoutPlan
 
 
@@ -42,19 +43,8 @@ class WorkoutPlanModel(BaseModel, GenericModel):
 
     def merge_model(self, model):
         super().merge_model(model)
+
         self.start_date = model.start_date
         self.end_date = model.end_date
-        self.merge_exercises(model.exercises)
 
-    def merge_exercises(self, exercises):
-        if not exercises:
-            self.exercises = list()
-            return
-
-        # for new_exercise in exercises:
-
-
-    @staticmethod
-    def __extract_exercise_by_id(exercises: List[ExercisePlanModel], exercise_id: str) -> Optional[ExercisePlanModel]:
-        return next((exercise for exercise in exercises if exercise.id == exercise_id), None)
-
+        merge_lists(self.exercises, model.exercises)

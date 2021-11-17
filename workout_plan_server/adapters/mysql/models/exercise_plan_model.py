@@ -1,10 +1,11 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from sqlalchemy import Column, String, ForeignKey, Integer, Float, DateTime, ForeignKeyConstraint
 from sqlalchemy.orm import relationship, declared_attr
 
 from workout_plan_server.adapters.mysql.models import BaseModel
+from workout_plan_server.adapters.mysql.utils.model_utils import merge_lists
 from workout_plan_server.domain.entities.exercise import Exercise
 from workout_plan_server.domain.entities.exercise_plan import ExercisePlan, ExerciseConfig
 from workout_plan_server.domain.entities.training import Training
@@ -73,6 +74,15 @@ class ExercisePlanModel(BaseModel):
         return ExercisePlan(exercise=self.exercise.to_entity(), current_exercise_config=exercise_config,
                             history_exercise_config=history_exercise_config)
 
+    def merge_model(self, exercise_plan):
+        self.sets = exercise_plan.sets
+        self.repetitions = exercise_plan.repetitions
+        self.weight = exercise_plan.weight
+        self.start_date = exercise_plan.start_date
+        self.exercise_id = exercise_plan.exercise_id
+
+        merge_lists(self.history_exercise_config, exercise_plan.history_exercise_config)
+
 
 class HistoryExercisePlanModel(BaseModel):
     __tablename__ = "history_exercise_plan"
@@ -108,6 +118,12 @@ class HistoryExercisePlanModel(BaseModel):
         history_exercise.weight = exercise_config.weight
 
         return history_exercise
+
+    def merge_model(self, history):
+        self.start_date = history.start_date
+        self.sets = history.sets
+        self.repetitions = history.repetitions
+        self.weight = history.weight
 
 
 class ExerciseTrainingModel(BaseModel):
