@@ -12,8 +12,8 @@ This directory must exist, and the user that will execute the workout-plan-serve
 
 In your development environment you can execute these commands:
 ```
-sudo mkdir /var/log/myhome-server
-sudo chmod 777 /var/log/myhome-server
+sudo mkdir /var/log/workout-plan
+sudo chmod 777 /var/log/workout-plan
 ```
 
 ## Tests
