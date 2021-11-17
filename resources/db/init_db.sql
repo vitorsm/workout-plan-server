@@ -13,7 +13,7 @@ CREATE TABLE exercise(
     name VARCHAR(255) NOT NULL,
     created_by_id VARCHAR(36) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    modified_at TIMESTAMP NOT NULL,
+    modified_at TIMESTAMP NOT NULL DEFAULT NOW(),
 
     exercise_type VARCHAR(255) NOT NULL,
     body_type VARCHAR(255) NOT NULL,
@@ -27,10 +27,10 @@ CREATE TABLE workout_plan(
     name VARCHAR(255) NOT NULL,
     created_by_id VARCHAR(36) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    modified_at TIMESTAMP NOT NULL,
+    modified_at TIMESTAMP NOT NULL DEFAULT NOW(),
 
     start_date TIMESTAMP NOT NULL DEFAULT NOW(),
-    end_date TIMESTAMP,
+    end_date TIMESTAMP NULL DEFAULT NULL,
 
     PRIMARY KEY (id)
 );
@@ -45,7 +45,7 @@ CREATE TABLE exercise_plan(
 
     PRIMARY KEY (exercise_id, workout_plan_id),
     FOREIGN KEY (exercise_id) REFERENCES exercise(id),
-    FOREIGN KEY (workout_plan_id) REFERENCES workout_plan(id)
+    FOREIGN KEY (workout_plan_id) REFERENCES workout_plan(id) ON DELETE CASCADE
 );
 
 CREATE TABLE history_exercise_plan(
@@ -57,8 +57,8 @@ CREATE TABLE history_exercise_plan(
     weight FLOAT NOT NULL,
 
     PRIMARY KEY (exercise_id, workout_plan_id, start_date),
-    FOREIGN KEY (exercise_id) REFERENCES exercise_plan(exercise_id),
-    FOREIGN KEY (workout_plan_id) REFERENCES exercise_plan(workout_plan_id)
+    FOREIGN KEY (exercise_id) REFERENCES exercise_plan(exercise_id) ON DELETE CASCADE,
+    FOREIGN KEY (workout_plan_id) REFERENCES exercise_plan(workout_plan_id) ON DELETE CASCADE
 );
 
 CREATE TABLE training (
@@ -66,11 +66,11 @@ CREATE TABLE training (
     name VARCHAR(255) NOT NULL,
     created_by_id VARCHAR(36) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    modified_at TIMESTAMP NOT NULL,
+    modified_at TIMESTAMP NOT NULL DEFAULT NOW(),
 
     workout_plan_id VARCHAR(36),
     start_date TIMESTAMP NOT NULL DEFAULT NOW(),
-    end_date TIMESTAMP,
+    end_date TIMESTAMP NULL DEFAULT NULL,
 
     PRIMARY KEY (id),
     FOREIGN KEY (workout_plan_id) REFERENCES workout_plan(id)
@@ -85,6 +85,6 @@ CREATE TABLE exercise_training (
     weight FLOAT NOT NULL,
 
     PRIMARY KEY (exercise_id, training_id),
-    FOREIGN KEY (exercise_id) REFERENCES exercise(id),
-    FOREIGN KEY (training_id) REFERENCES training(id)
+    FOREIGN KEY (exercise_id) REFERENCES exercise(id) ON DELETE CASCADE,
+    FOREIGN KEY (training_id) REFERENCES training(id) ON DELETE CASCADE
 );

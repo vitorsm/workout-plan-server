@@ -19,12 +19,19 @@ def create_exercise(workout_plan_service: WorkoutPlanService):
 
 @workout_plan_controller.route("<path:workout_plan_id>", methods=["PUT"])
 @jwt_required()
-def update_exercise(workout_plan_id: str, workout_plan_service: WorkoutPlanService):
+def update_workout_plan(workout_plan_id: str, workout_plan_service: WorkoutPlanService):
     workout_plan = WorkoutPlanMapper.to_entity(request.json)
     workout_plan.id = workout_plan_id
 
     workout_plan_service.update(workout_plan)
     return jsonify(WorkoutPlanMapper.to_dto(workout_plan)), 200
+
+
+@workout_plan_controller.route("<path:workout_plan_id>", methods=["DELETE"])
+@jwt_required()
+def delete_workout_plan(workout_plan_id: str, workout_plan_service: WorkoutPlanService):
+    workout_plan_service.delete(workout_plan_id)
+    return "", 204
 
 
 @workout_plan_controller.route("/", methods=["GET"])

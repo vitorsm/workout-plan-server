@@ -13,8 +13,8 @@ from workout_plan_server.domain.entities.workout_plan import WorkoutPlan
 
 class WorkoutPlanModel(BaseModel, GenericModel):
     __tablename__ = "workout_plan"
-    start_date = Column(DateTime, nullable=False, default=datetime.utcnow, primary_key=True)
-    end_date = Column(DateTime, default=datetime.utcnow, primary_key=True)
+    start_date = Column(DateTime, nullable=False, default=datetime.utcnow)
+    end_date = Column(DateTime, default=datetime.utcnow)
 
     @declared_attr
     def exercises(self):

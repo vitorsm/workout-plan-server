@@ -173,7 +173,13 @@ class GenericControllerTest(metaclass=abc.ABCMeta):
 
     def __assert_equal_item(self, item_a: dict, item_b: dict):
         for key, value in item_a.items():
-            self.assertEqual(value, item_b[key])
+            if isinstance(value, dict):
+                self.__assert_equal_item(value, item_b[key])
+            elif isinstance(value, list):
+                for index, item_from_value in enumerate(value):
+                    self.__assert_equal_item(item_from_value, item_b[key][index])
+            else:
+                self.assertEqual(value, item_b[key])
 
     def __assert_each_item(self, item_dto: dict):
         self.assertIsNotNone(item_dto["name"])
