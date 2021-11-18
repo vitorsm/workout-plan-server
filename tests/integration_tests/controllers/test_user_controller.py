@@ -120,6 +120,64 @@ class TestUserController(BaseTest):
         self.assertEqual(200, response.status_code)
         self.assertIsNotNone(response_dto["access_token"])
 
+    def test_create_update_and_authenticate_success(self):
+        user_dto = {
+            "login": "user",
+            "password": "user",
+            "name": "User"
+        }
+
+        # Creating user
+        response = self.client.post(f"/v1/user/", json=user_dto)
+        response_dto = json.loads(response.data.decode())
+
+        self.assertEqual(200, response.status_code)
+
+        user_id = response_dto["id"]
+
+        login_dto = {
+            "username": "user",
+            "password": "user"
+        }
+
+        # Testing login
+        response = self.client.post(f"/v1/auth/authenticate", json=login_dto)
+        response_dto = json.loads(response.data.decode())
+        token = response_dto["access_token"]
+        header = {"Authorization": f"JWT {token}"}
+
+        self.assertEqual(200, response.status_code)
+        self.assertIsNotNone(token)
+
+        # Testing update user
+        user_dto["name"] = "User1"
+        response = self.client.put(f"/v1/user/{user_id}", json=user_dto, headers=header)
+        response_dto = json.loads(response.data.decode())
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(user_dto["name"], response_dto["name"])
+
+        # Testing login after update user without change password
+        response = self.client.post(f"/v1/auth/authenticate", json=login_dto, headers=header)
+        response_dto = json.loads(response.data.decode())
+
+        self.assertEqual(200, response.status_code)
+        self.assertIsNotNone(response_dto["access_token"])
+
+        # Updating password
+        user_dto["password"] = "user1"
+        response = self.client.put(f"/v1/user/{user_id}", json=user_dto, headers=header)
+
+        self.assertEqual(200, response.status_code)
+
+        # Testing new password in login
+        login_dto["password"] = "user1"
+        response = self.client.post(f"/v1/auth/authenticate", json=login_dto)
+        response_dto = json.loads(response.data.decode())
+
+        self.assertEqual(200, response.status_code)
+        self.assertIsNotNone(response_dto["access_token"])
+
     def test_authenticate_invalid_credentials(self):
         login_dto = {
             "username": "admin",
