@@ -55,7 +55,9 @@ class WorkoutPlanModel(BaseModel, GenericModel):
         self.start_date = workout_plan.start_date
         self.end_date = workout_plan.end_date
 
-        for exercise in workout_plan.exercises:
-            exercise.workout_plan = self
+        if workout_plan.exercises:
+            for exercise in workout_plan.exercises:
+                exercise.workout_plan = self
 
         merge_lists(self.exercises, workout_plan.exercises, models_to_add)
+

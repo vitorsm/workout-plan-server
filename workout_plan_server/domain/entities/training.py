@@ -22,7 +22,8 @@ class Training(GenericEntity):
         self.id = training_id
 
     def __generate_training_name(self) -> str:
-        return f"Training {self.start_date.date()}"
+        str_date = self.start_date.date() if self.start_date else ""
+        return f"Training {str_date}"
 
     def get_missing_fields(self) -> List[str]:
         missing_fields = list()

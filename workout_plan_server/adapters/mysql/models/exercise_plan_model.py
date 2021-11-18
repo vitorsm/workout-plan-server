@@ -188,3 +188,15 @@ class ExerciseTrainingModel(BaseModel):
                                          start_date=None)
         return ExercisePlan(exercise=self.exercise.to_entity(), current_exercise_config=exercise_config,
                             history_exercise_config=list())
+
+    def merge_model(self, exercise_training, models_to_add: list):
+        """
+        Will update this fields from exercise_training fields. The models_to_add will be ignored, it is only
+        for the contract
+
+        :param exercise_training: the exercise_training with the new fields
+        :param models_to_add: list that will be ignored
+        """
+        self.sets = exercise_training.sets
+        self.repetitions = exercise_training.repetitions
+        self.weight = exercise_training.weight

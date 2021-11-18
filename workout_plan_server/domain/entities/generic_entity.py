@@ -23,6 +23,9 @@ class GenericEntity(metaclass=abc.ABCMeta):
     def __hash__(self):
         return hash(self.id)
 
+    def _set_name(self, name: str):
+        self.name = name
+
     def fill_track(self, user: User, curr_date: Optional[datetime] = None):
         if not curr_date:
             curr_date = datetime.now()

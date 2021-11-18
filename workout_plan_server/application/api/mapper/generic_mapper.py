@@ -11,7 +11,10 @@ class GenericMapper(object):
     @staticmethod
     def fill_generic_entity(dto: Optional[dict], entity: GenericEntity):
         entity.id = dto.get("id")
-        entity.name = dto.get("name")
+
+        if dto.get("name"):
+            entity.name = dto.get("name")
+
         entity.created_at = date_utils.from_str_to_date(dto.get("created_at"))
         entity.modified_at = date_utils.from_str_to_date(dto.get("modified_at"))
         entity.created_by = UserMapper.to_entity(dto.get("created_by"))

@@ -74,10 +74,16 @@ class GenericEntityService(metaclass=abc.ABCMeta):
             raise InvalidEntityException(self.get_entity_name(), missing_fields)
 
     def prepare_to_persist(self, entity: GenericEntity):
+        if not entity:
+            return
+
         user = self.authentication_repository.get_current_user()
         entity.fill_track(user)
 
     def valid_to_persist(self, entity: GenericEntity, to_delete: bool):
+        if not entity:
+            raise InvalidEntityException(self.get_entity_name(), list())
+
         user = self.authentication_repository.get_current_user()
 
         GenericEntityService.__assert_entity_user(entity, user)
