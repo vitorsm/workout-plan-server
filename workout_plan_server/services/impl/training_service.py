@@ -40,7 +40,7 @@ class TrainingService(GenericEntityService):
         if not training.workout_plan or not training.workout_plan.id:
             return
 
-        training.workout_plan = self.workout_plan_service.find_by_id(training.id)
+        training.workout_plan = self.workout_plan_service.find_by_id(training.workout_plan.id)
 
     def __fill_exercises(self, training: Training):
         exercise_ids = [exercise.exercise.id for exercise in training.exercises] if training.exercises else None

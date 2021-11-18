@@ -185,7 +185,8 @@ class GenericControllerTest(metaclass=abc.ABCMeta):
                 for index, item_from_value in enumerate(value):
                     self.__assert_equal_item(item_from_value, item_b[key][index])
             else:
-                self.assertEqual(value, item_b[key])
+                if value and item_b.get(key):
+                    self.assertEqual(value, item_b[key])
 
     def __assert_each_item(self, item_dto: dict):
         self.assertIsNotNone(item_dto["name"])
