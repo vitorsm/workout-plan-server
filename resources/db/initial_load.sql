@@ -1,7 +1,7 @@
 
 
 INSERT INTO user (id, name, login, password) VALUES (
-    '00000000-0000-0000-0000-000000000001', 'Admin', 'admin', 'admin'
+    '00000000-0000-0000-0000-000000000001', 'Admin', 'admin', '$2b$12$lDFwg9L7LEBZ0myDVNU.3OZItrK60UN7hWpEAW.qb7ofnrrMByYJ2' -- pass: user1
 ), (
     '00000000-0000-0000-0000-000000000002', 'User 2', 'user2', 'user2'
 );

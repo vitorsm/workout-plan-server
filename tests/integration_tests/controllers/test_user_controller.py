@@ -108,5 +108,24 @@ class TestUserController(BaseTest):
         self.assertEqual(409, response.status_code)
         self.assertEqual("DuplicateEntityException", response_dto["type"])
 
+    def test_authenticate_success(self):
+        login_dto = {
+            "username": "admin",
+            "password": "user1"
+        }
 
+        response = self.client.post(f"/v1/auth/authenticate", json=login_dto)
+        response_dto = json.loads(response.data.decode())
 
+        self.assertEqual(200, response.status_code)
+        self.assertIsNotNone(response_dto["access_token"])
+
+    def test_authenticate_invalid_credentials(self):
+        login_dto = {
+            "username": "admin",
+            "password": "user"
+        }
+
+        response = self.client.post(f"/v1/auth/authenticate", json=login_dto)
+
+        self.assertEqual(401, response.status_code)

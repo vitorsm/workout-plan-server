@@ -2,6 +2,7 @@ from flask import Flask
 from injector import Module, Binder, singleton
 from flask_sqlalchemy import SQLAlchemy
 
+from workout_plan_server.adapters.bcrypt_encryption_adapter import BCryptEncryptionAdapter
 from workout_plan_server.adapters.mysql.impl.mysql_exercise_repository import MySQLExerciseRepository
 from workout_plan_server.adapters.mysql.impl.mysql_training_repository import MySQLTrainingRepository
 from workout_plan_server.adapters.mysql.impl.mysql_user_repository import MySQLUserRepository
@@ -33,8 +34,10 @@ class DependenciesInjector(Module):
         workout_plan_repository = MySQLWorkoutPlanRepository(self.db)
         training_repository = MySQLTrainingRepository(self.db)
 
+        encryption_adapter = BCryptEncryptionAdapter()
+
         exercise_service = ExerciseService(authentication_repository, exercise_repository)
-        user_service = UserService(user_repository, authentication_repository)
+        user_service = UserService(user_repository, authentication_repository, encryption_adapter)
         workout_plan_service = WorkoutPlanService(workout_plan_repository, authentication_repository,
                                                   exercise_service)
         training_service = TrainingService(authentication_repository, training_repository, exercise_service,

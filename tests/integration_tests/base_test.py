@@ -30,7 +30,7 @@ class BaseTest(TestCase):
         self.app.config["SQLALCHEMY_DATABASE_URI"] = BaseTest.SQLALCHEMY_DATABASE_URI
         self.app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         self.app.config['SECRET_KEY'] = configs.ENCRYPT_SECRET_KEY
-        self.app.config['JWT_AUTH_URL_RULE'] = "/api/auth/authenticate"
+        self.app.config['JWT_AUTH_URL_RULE'] = "/v1/auth/authenticate"
         self.app.config['JWT_EXPIRATION_DELTA'] = timedelta(hours=configs.HOURS_TO_EXPIRATION_TOKEN)
 
         controllers_register.register_controllers(self.app)

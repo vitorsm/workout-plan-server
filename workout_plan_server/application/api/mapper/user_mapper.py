@@ -17,4 +17,7 @@ class UserMapper(object):
         if not entity:
             return None
 
-        return entity.__dict__
+        dto = entity.__dict__
+        dto["password"] = None
+
+        return dto
