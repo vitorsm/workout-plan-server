@@ -36,8 +36,9 @@ class DependenciesInjector(Module):
         exercise_service = ExerciseService(authentication_repository, exercise_repository)
         user_service = UserService(user_repository, authentication_repository)
         workout_plan_service = WorkoutPlanService(workout_plan_repository, authentication_repository,
-                                                  exercise_repository)
-        training_service = TrainingService(authentication_repository, training_repository, exercise_repository)
+                                                  exercise_service)
+        training_service = TrainingService(authentication_repository, training_repository, exercise_service,
+                                           workout_plan_service)
 
         # Repositories
         binder.bind(ExerciseRepository, to=exercise_repository, scope=singleton)

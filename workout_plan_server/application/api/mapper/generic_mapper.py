@@ -12,6 +12,9 @@ class GenericMapper(object):
     def fill_generic_entity(dto: Optional[dict], entity: GenericEntity):
         entity.id = dto.get("id")
 
+        if not hasattr(entity, "name"):
+            entity.name = None
+
         if dto.get("name"):
             entity.name = dto.get("name")
 

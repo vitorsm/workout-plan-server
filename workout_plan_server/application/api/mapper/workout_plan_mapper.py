@@ -28,11 +28,12 @@ class WorkoutPlanMapper(object):
         if not workout_plan:
             return None
 
-        exercises = [ExercisePlanMapper.to_dto(exercise) for exercise in workout_plan.exercises]
+        exercises = [ExercisePlanMapper.to_dto(exercise) for exercise in workout_plan.exercises] \
+            if workout_plan.exercises else None
 
         dto = {
             "exercises": exercises,
-            "start_date": workout_plan.start_date.isoformat(),
+            "start_date": workout_plan.start_date.isoformat() if workout_plan.start_date else None,
             "end_date": workout_plan.end_date.isoformat() if workout_plan.end_date else None
         }
 

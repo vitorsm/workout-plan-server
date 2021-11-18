@@ -58,8 +58,8 @@ class GenericControllerTest(metaclass=abc.ABCMeta):
 
         return f"{self.get_base_endpoint()}{entity_id}"
 
-    def _find_by_id(self):
-        return self.client_api().get(self._get_endpoint_by_id(), headers=self.get_authentication_header())
+    def _find_by_id(self, entity_id: Optional[str] = None):
+        return self.client_api().get(self._get_endpoint_by_id(entity_id), headers=self.get_authentication_header())
 
     def test_find_by_id(self):
         response = self._find_by_id()

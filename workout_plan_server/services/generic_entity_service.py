@@ -52,16 +52,27 @@ class GenericEntityService(metaclass=abc.ABCMeta):
         self.get_repository().delete(entity)
 
     def find_by_id(self, entity_id: str) -> Optional[GenericEntity]:
-        user = self.authentication_repository.get_current_user()
-
         entity = self.get_repository().find_by_id(entity_id)
 
         if not entity:
             return None
 
+        user = self.authentication_repository.get_current_user()
         GenericEntityService.__assert_entity_user(entity, user)
 
         return entity
+
+    def find_all_by_ids(self, entity_ids: List[str]) -> List[GenericEntity]:
+        entities = self.get_repository().find_all_by_ids(entity_ids)
+
+        if not entities:
+            return entities
+
+        user = self.authentication_repository.get_current_user()
+        for entity in entities:
+            GenericEntityService.__assert_entity_user(entity, user)
+
+        return entities
 
     def find_all_by_user(self) -> List[GenericEntity]:
         user = self.authentication_repository.get_current_user()

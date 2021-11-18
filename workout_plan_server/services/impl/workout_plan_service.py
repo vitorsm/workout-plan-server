@@ -4,6 +4,7 @@ from workout_plan_server.domain.entities.exercise import Exercise
 from workout_plan_server.domain.entities.workout_plan import WorkoutPlan
 from workout_plan_server.domain.exceptions.permission_exception import PermissionException
 from workout_plan_server.services.generic_entity_service import GenericEntityService
+from workout_plan_server.services.impl.exercise_service import ExerciseService
 from workout_plan_server.services.ports.authentication_repository import AuthenticationRepository
 from workout_plan_server.services.ports.exercise_repository import ExerciseRepository
 from workout_plan_server.services.ports.workout_plan_repository import WorkoutPlanRepository
@@ -12,10 +13,10 @@ from workout_plan_server.services.ports.workout_plan_repository import WorkoutPl
 class WorkoutPlanService(GenericEntityService):
 
     def __init__(self, workout_plan_repository: WorkoutPlanRepository,
-                 authentication_repository: AuthenticationRepository, exercise_repository: ExerciseRepository):
+                 authentication_repository: AuthenticationRepository, exercise_service: ExerciseService):
         super().__init__(authentication_repository)
         self.workout_plan_repository = workout_plan_repository
-        self.exercise_repository = exercise_repository
+        self.exercise_service = exercise_service
 
     def get_repository(self) -> WorkoutPlanRepository:
         return self.workout_plan_repository
@@ -27,21 +28,13 @@ class WorkoutPlanService(GenericEntityService):
         super().prepare_to_persist(entity)
         self.__fill_exercises(entity)
 
-    def valid_to_persist(self, entity: WorkoutPlan, to_delete: bool):
-        super().valid_to_persist(entity, to_delete)
-        user = self.authentication_repository.get_current_user()
-
-        for exercise_plan in entity.exercises:
-            if exercise_plan.exercise.created_by != user:
-                raise PermissionException("You don't have permission to use exercise from other users")
-
     def __fill_exercises(self, workout_plan: WorkoutPlan):
         exercise_ids = [exercise.exercise.id for exercise in workout_plan.exercises] if workout_plan.exercises else None
 
         if not exercise_ids:
             return
 
-        exercises: List[Exercise] = self.exercise_repository.find_all_by_ids(exercise_ids)
+        exercises: List[Exercise] = self.exercise_service.find_all_by_ids(exercise_ids)
         exercise_plans = list()
         for exercise_plan in workout_plan.exercises:
             if not exercise_plan.exercise or not exercise_plan.exercise.id:

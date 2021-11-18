@@ -4,6 +4,8 @@ from workout_plan_server.domain.entities.exercise import Exercise
 from workout_plan_server.domain.entities.training import Training
 from workout_plan_server.domain.exceptions.permission_exception import PermissionException
 from workout_plan_server.services.generic_entity_service import GenericEntityService
+from workout_plan_server.services.impl.exercise_service import ExerciseService
+from workout_plan_server.services.impl.workout_plan_service import WorkoutPlanService
 from workout_plan_server.services.ports.authentication_repository import AuthenticationRepository
 from workout_plan_server.services.ports.entity_repository import EntityRepository
 from workout_plan_server.services.ports.exercise_repository import ExerciseRepository
@@ -13,11 +15,12 @@ from workout_plan_server.services.ports.training_repository import TrainingRepos
 class TrainingService(GenericEntityService):
 
     def __init__(self, authentication_repository: AuthenticationRepository, training_repository: TrainingRepository,
-                 exercise_repository: ExerciseRepository):
+                 exercise_service: ExerciseService, workout_plan_service: WorkoutPlanService):
         super().__init__(authentication_repository)
 
         self.training_repository = training_repository
-        self.exercise_repository = exercise_repository
+        self.exercise_service = exercise_service
+        self.workout_plan_service = workout_plan_service
 
     def get_repository(self) -> EntityRepository:
         return self.training_repository
@@ -31,21 +34,13 @@ class TrainingService(GenericEntityService):
 
         super().prepare_to_persist(entity)
         self.__fill_exercises(entity)
+        self.__fill_workout_plan(entity)
 
-    def valid_to_persist(self, entity: Training, to_delete: bool):
-        super().valid_to_persist(entity, to_delete)
-
-        if to_delete:
+    def __fill_workout_plan(self, training: Training):
+        if not training.workout_plan or not training.workout_plan.id:
             return
 
-        if not entity.exercises:
-            return
-
-        user = self.authentication_repository.get_current_user()
-
-        for exercise_plan in entity.exercises:
-            if exercise_plan.exercise.created_by != user:
-                raise PermissionException("You don't have permission to use exercise from other users")
+        training.workout_plan = self.workout_plan_service.find_by_id(training.id)
 
     def __fill_exercises(self, training: Training):
         exercise_ids = [exercise.exercise.id for exercise in training.exercises] if training.exercises else None
@@ -53,7 +48,7 @@ class TrainingService(GenericEntityService):
         if not exercise_ids:
             return
 
-        exercises: List[Exercise] = self.exercise_repository.find_all_by_ids(exercise_ids)
+        exercises: List[Exercise] = self.exercise_service.find_all_by_ids(exercise_ids)
         exercise_plans = list()
         for exercise_plan in training.exercises:
             if not exercise_plan.exercise or not exercise_plan.exercise.id:
